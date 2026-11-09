@@ -1,0 +1,865 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Pocket Pro</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: a mown fairway (striped turf) fills the page; one scorecard-style panel sits on it with club tabs, question chips, and the pro's answer card. */
+:root {
+  --turf-1: #2f6b3a;
+  --turf-2: #367741;
+  --turf-ink: #0f2614;
+  --card: #fbfcf7;
+  --card-2: #eef3e6;
+  --ink: #1b2a1e;
+  --muted: #56655a;
+  --line: #cfdac6;
+  --flag: #e8b923;
+  --flag-ink: #2a2105;
+  --pin: #c8402f;
+  --link: #1f6a35;
+  --display: "Alfa Slab One", "Rockwell", "Georgia", serif;
+  --body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --turf-1: #10281a; --turf-2: #13301f; --turf-ink: #06120a;
+    --card: #17221a; --card-2: #1e2c21; --ink: #e6efe2; --muted: #a3b3a5;
+    --line: #2f4334; --flag: #f0c53a; --flag-ink: #241c03; --pin: #e2675a; --link: #8fd3a0;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --turf-1: #10281a; --turf-2: #13301f; --turf-ink: #06120a;
+  --card: #17221a; --card-2: #1e2c21; --ink: #e6efe2; --muted: #a3b3a5;
+  --line: #2f4334; --flag: #f0c53a; --flag-ink: #241c03; --pin: #e2675a; --link: #8fd3a0;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--ink);
+  background-color: var(--turf-1);
+  background-image:
+    radial-gradient(ellipse at 50% -10%, rgba(255,255,255,.10), transparent 60%),
+    repeating-linear-gradient(115deg, var(--turf-1) 0 64px, var(--turf-2) 64px 128px);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+.wrap {
+  max-width: 760px;
+  margin: 0 auto;
+  padding-block: 28px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid;
+  gap: 18px;
+}
+
+/* Masthead */
+header.mast {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  align-items: center;
+  color: #fff;
+}
+.flagstick { width: 58px; height: 72px; }
+.mast h1 {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(2.3rem, 9vw, 3.4rem);
+  line-height: 1;
+  letter-spacing: .01em;
+  text-shadow: 0 2px 0 var(--turf-ink);
+  text-wrap: balance;
+}
+.mast p { margin: 6px 0 0; font-size: 1.02rem; color: #e4f1e0; max-width: 46ch; }
+
+/* Scorecard panel */
+.card {
+  background: var(--card);
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.28);
+  overflow: hidden;
+}
+.card-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 6px 12px;
+  padding: 14px 18px;
+  background: var(--flag);
+  color: var(--flag-ink);
+}
+.card-head strong { font-size: 1.05rem; }
+.card-head span { font-family: var(--mono); font-size: .78rem; letter-spacing: .06em; text-transform: uppercase; }
+
+.tabs {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  border-bottom: 1px solid var(--line);
+  background: var(--card-2);
+}
+.tab {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font: 700 .98rem/1.2 var(--body);
+  padding: 14px 6px 12px;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  display: grid;
+  gap: 3px;
+  justify-items: center;
+  text-align: center;
+  min-width: 0;
+}
+.tab small { font: 500 .68rem var(--mono); letter-spacing: .08em; text-transform: uppercase; opacity: .8; }
+.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--pin); background: var(--card); }
+.tab:focus-visible, .q:focus-visible, .btn:focus-visible { outline: 3px solid var(--flag); outline-offset: 2px; }
+
+.questions {
+  list-style: none;
+  margin: 0;
+  padding: 10px;
+  display: grid;
+  gap: 6px;
+}
+.q {
+  width: 100%;
+  text-align: left;
+  appearance: none;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--ink);
+  font: 600 1.02rem/1.3 var(--body);
+  padding: 13px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  transition: border-color .15s, background .15s;
+}
+.q .hole {
+  font: 500 .78rem var(--mono);
+  width: 28px; height: 28px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  border: 1.5px solid var(--line);
+  color: var(--muted);
+}
+.q .go { color: var(--muted); font-size: 1.2rem; }
+.q:hover { border-color: var(--link); }
+.q[aria-pressed="true"] { background: var(--card-2); border-color: var(--pin); }
+.q[aria-pressed="true"] .hole { background: var(--pin); border-color: var(--pin); color: #fff; }
+
+/* Answer */
+.answer { padding: 0; }
+.empty {
+  padding: 28px 20px;
+  text-align: center;
+  color: var(--muted);
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+}
+.empty svg { width: 54px; height: 54px; }
+.empty p { margin: 0; max-width: 34ch; }
+.ans-body { padding: 20px 20px 8px; display: grid; gap: 16px; }
+.eyebrow { font: 500 .74rem var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--pin); margin: 0; }
+.ans-body h2 {
+  margin: 2px 0 0;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(1.5rem, 5.5vw, 1.9rem);
+  line-height: 1.15;
+  text-wrap: balance;
+}
+.ans-body h3 {
+  margin: 0 0 6px;
+  font-size: .8rem;
+  font-family: var(--mono);
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.ans-body p { margin: 0; max-width: 65ch; }
+.fixes { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.fixes li { display: grid; grid-template-columns: 24px 1fr; gap: 10px; align-items: start; }
+.fixes li::before {
+  content: "";
+  width: 12px; height: 12px; margin: 7px 0 0 4px;
+  border-radius: 50%;
+  background: var(--card);
+  border: 2px solid var(--link);
+}
+.fixes b { color: var(--ink); }
+.drill {
+  background: var(--card-2);
+  border-left: 4px solid var(--flag);
+  border-radius: 0 10px 10px 0;
+  padding: 12px 14px;
+}
+.drill h3 { color: var(--ink); }
+.sources { font-size: .92rem; }
+.sources ul { margin: 0; padding-left: 18px; display: grid; gap: 3px; }
+.sources a { color: var(--link); text-underline-offset: 2px; word-break: break-word; }
+.note { font-size: .86rem; color: var(--muted); }
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 12px 18px 18px;
+  border-top: 1px dashed var(--line);
+}
+.btn {
+  appearance: none;
+  border: 0;
+  border-radius: 999px;
+  padding: 12px 22px;
+  font: 700 1rem var(--body);
+  cursor: pointer;
+  background: var(--pin);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn:disabled { opacity: .4; cursor: default; }
+
+footer { color: #d6e8d2; font-size: .82rem; text-align: center; }
+
+@media (max-width: 440px) {
+  .tab { font-size: .9rem; }
+  .ans-body { padding: 18px 16px 6px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ans-body { animation: rise .25s ease-out; }
+  @keyframes rise { from { transform: translateY(6px); opacity: .6; } to { transform: none; opacity: 1; } }
+}
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <svg class="flagstick" viewBox="0 0 58 72" aria-hidden="true">
+      <ellipse cx="22" cy="66" rx="18" ry="5" fill="#0f2614" opacity=".55"/>
+      <rect x="20" y="4" width="3" height="62" rx="1.5" fill="#f4f4ee"/>
+      <path d="M23 5 L54 14 L23 24 Z" fill="#e8b923"/>
+      <circle cx="40" cy="62" r="6" fill="#fdfdf8"/>
+      <circle cx="38.5" cy="60.5" r="1" fill="#c9cbbf"/><circle cx="41.5" cy="61" r="1" fill="#c9cbbf"/><circle cx="40" cy="63.5" r="1" fill="#c9cbbf"/>
+    </svg>
+    <div>
+      <h1>Pocket Pro</h1>
+      <p>Select a question from the list below and the pro's answer will be provided.</p>
+    </div>
+  </header>
+
+  <section class="card" aria-label="Questions">
+    <div class="card-head">
+      <strong>Pick your club, then your question</strong>
+      <span id="count">33 questions</span>
+    </div>
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <ul class="questions" id="questions"></ul>
+  </section>
+
+  <section class="card answer" aria-live="polite" aria-label="Pro answer">
+    <div id="answer"></div>
+    <div class="actions">
+      <button class="btn" id="clear" type="button" disabled>
+        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+        Clear answer
+      </button>
+    </div>
+  </section>
+
+  <footer>Tips written for a right-handed golfer. Left-handed? Flip every left and right.</footer>
+</div>
+
+<script>
+const S = {
+  gmPull: ["Golf Monthly: Why you pull or slice your driver", "https://www.golfmonthly.com/tips/why-you-pull-or-slice-your-driver"],
+  ncgSlice: ["National Club Golfer: Ali Taylor, stop slicing your driver", "https://www.nationalclubgolfer.com/golf-tips/ali-taylor-stop-slicing-driver"],
+  golfArmitage: ["GOLF.com: Fix your stubborn slice with one swing thought", "https://golf.com/instruction/fix-your-stubborn-slice-with-simple-swing-thought/"],
+  golfHarmon: ["GOLF.com: Fix your slice, Top 100 Teacher tip", "https://golf.com/instruction/fix-slice-claude-harmon/?amp=1"],
+  gdsaSlice: ["Golf Digest SA: Slice and hook fixes", "https://online.flippingbook.com/view/1899122/88"],
+  hmHookDr: ["HackMotion: Stop hooking your driver", "https://hackmotion.com/how-to-stop-hooking-driver/"],
+  golfStenzelHook: ["GOLF.com: Kellie Stenzel, 10 ways to fix a hook", "https://golf.com/instruction/10-ways-fix-hook-kellie-stenzel/"],
+  ncgHook: ["National Club Golfer: Stop hooking the ball with driver", "https://www.nationalclubgolfer.com/golf-tips/driving-tips/how-to-stop-hooking-the-ball-with-driver/"],
+  hmHook: ["HackMotion: Golf hook fix", "https://hackmotion.com/how-to-fix-hook-in-golf/"],
+  agHook: ["American Golf: How to fix a hook", "https://blog.americangolf.co.uk/how-to-fix-a-hook/"],
+  golfHook2: ["GOLF.com: Why you hook it, 2 causes", "https://golf.com/instruction/why-you-hook-golf-ball-2-causes/?amp=1"],
+  ncgTopDr: ["National Club Golfer: How to stop topping your driver", "https://www.nationalclubgolfer.com/golf-tips/how-to-stop-topping-your-driver"],
+  mgsTop: ["MyGolfSpy: Why am I topping the ball?", "https://mygolfspy.com/news-opinion/why-am-i-topping-the-ball-common-causes-and-quick-fixes/"],
+  skillTop: ["Skillest: The five real causes of topping", "https://blog.skillest.com/?p=9684"],
+  caddieTop: ["CaddieHQ: Why am I topping my irons?", "https://www.caddiehq.com/resources/why-am-i-topping-the-golf-ball-with-my-irons"],
+  golfTension: ["GOLF.com: Drill to stop topping the ball", "https://golf.com/instruction/drill-stop-topping-ball/"],
+  whyTop: ["WhyGolf: How to stop topping the golf ball", "https://whygolf.com/blogs/whysguyscorner/how-to-stop-topping-the-golf-ball"],
+  golftec: ["GOLFTEC: How to stop hitting fat and thin shots", "https://golftec.com/blog-posts/how-to-stop-hitting-fat-shots-thin-shots"],
+  mgsFat: ["MyGolfSpy: The No. 1 cause of fat shots", "https://mygolfspy.com/news-opinion/the-no-1-cause-of-fat-shots-and-what-to-do-instead/"],
+  mgsSetup: ["MyGolfSpy: The setup adjustment that fixes thin and fat irons", "https://mygolfspy.com/the-setup-adjustment-that-fixes-thin-and-fat-iron-shots/"],
+  hmFat: ["HackMotion: Stop hitting fat shots", "https://hackmotion.com/how-to-stop-hitting-fat-shots/"],
+  golfHutt: ["GOLF.com: Jake Hutt, 2 adjustments to hit driver farther", "https://golf.com/instruction/driving/2-simple-adjustments-hit-driver-farther-jake-hutt"],
+  golfTee: ["GOLF.com: How tee height affects driving distance", "https://golf.com/instruction/driving/how-does-tee-height-affect-driving-distance-play-smart/"],
+  stixDist: ["Stix Golf: How to increase driver distance", "https://stix.golf/blogs/rough-thoughts/how-to-increase-driver-distance"],
+  sigTee: ["Shop Indoor Golf: Launch monitor tee-height test", "https://shopindoorgolf.com/pages/how-to-increase-your-driver-distance-with-a-launch-monitor"],
+  ncgLow: ["National Club Golfer: How to hit a driver low", "https://www.nationalclubgolfer.com/golf-tips/how-to-hit-a-driver-low"],
+  golfScheffler: ["GOLF.com: Scottie Scheffler's stinger", "https://golf.com/instruction/driving/scottie-scheffler-stinger-shot-tips/"],
+  agdSting: ["Australian Golf Digest: Sting one out there", "https://www.australiangolfdigest.com.au/two-minute-clinic-sting-one-out-there/"],
+  hmLaunch: ["HackMotion: Increase launch angle with driver", "https://hackmotion.com/?p=129669"],
+  igrTilt: ["Independent Golf Reviews: How to hit a driver", "https://www.independentgolfreviews.com/?p=51392"],
+  golfYarwood: ["GOLF.com: Jonathan Yarwood, powerboost your drives", "https://golf.com/instruction/driving/powerboost-your-drives-doing-this-top-teacher/"],
+  mmgSlice: ["Me and My Golf: How to fix your slice", "https://meandmygolf.com/golf-tips/fix-a-slice-golf/how-to-fix-your-slice/"],
+  gmJacobs: ["Golf Monthly: John Jacobs, 3 tips to stop slicing", "https://www.golfmonthly.com/tips/3-tips-to-stop-slicing-drives-198910"],
+  golfSprecher: ["GOLF.com: 2 ways to compress the ball", "https://golf.com/instruction/approach-shots/2-ways-compress-ball-hit-more-crisp-irons/"],
+  mgsSame: ["MyGolfSpy: Why your irons all go the same distance", "https://mygolfspy.com/news-opinion/instruction/why-your-irons-all-go-the-same-distance-and-how-to-fix-that/"],
+  hmCompress: ["HackMotion: How to compress the golf ball", "https://hackmotion.com/?p=85955"],
+  gmKnock: ["Golf Monthly: Rick Shiels, the knockdown shot", "https://www.golfmonthly.com/videos/long-game-tips/how-to-play-knockdown-shot"],
+  golfKnock: ["GOLF.com: Hit a knockdown like Rory", "https://golf.com/?p=15560770"],
+  titStinger: ["Titleist: How to hit the stinger", "https://www.titleist.com/teamtitleist/b/tourblog/posts/titleist-tips-how-to-hit-the-stinger"],
+  golfFleetwood: ["GOLF.com: Tommy Fleetwood iron tips", "https://golf.com/news/tommy-fleetwood-irons-tips/?amp=1"],
+  giHigh: ["Golf Influence: How to hit irons higher", "https://www.golfinfluence.com/skill/how-to-hit-irons-higher"],
+  ggHigh: ["Golfer Geeks: How to hit irons higher", "https://golfergeeks.com/how-to-hit-irons-higher/"],
+  gdChip: ["Golf Digest: The right way to chip", "https://www.golfdigest.com/story/the-right-way-to-chip"],
+  gmChip: ["Golf Monthly: Anders Mankert, how to chip", "https://golfmonthly.com/tips/short-game-tips/how-to-chip-in-golf"],
+  golfStenzelChip: ["GOLF.com: Kellie Stenzel, become the ultimate chipper", "https://golf.com/instruction/short-game/10-steps-become-ultimate-chipper-kellie-stenzel/"],
+  golfMickelson: ["GOLF.com: Phil Mickelson's chipping keys", "https://golf.com/instruction/short-game/phil-mickelson-chipping-keys-short-game/"],
+  mgsChipWt: ["MyGolfSpy: Can your weight be too far forward chipping?", "https://mygolfspy.com/news-opinion/instruction/can-your-weight-be-too-far-forward-when-chipping/"],
+  rsClub: ["RotarySwing: Chipping club selection", "https://rotaryswing.com/golf-instruction/shortgame/golf-chipping-how-to-guide/golf-chipping-club-how-to-choose"],
+  golfBump: ["GOLF.com: Ditch the flop, learn the bump-and-run", "https://www.golf.com/instruction/ditch-flop-shot-and-learn-bump-and-run"],
+  mgsUpDown: ["MyGolfSpy: What club should you use to get up and down?", "https://mygolfspy.com/news-opinion/partner-content/what-club-should-you-use-to-get-up-and-down/"],
+  golficity: ["Golficity: Chipping club selection strategy", "https://golficity.com/?p=107880"],
+  hkPutt: ["Human Kinetics: Putting techniques", "https://canada.humankinetics.com/blogs/excerpt/putting-techniques"],
+  gmagPutt: ["GolfMagic: The fundamentals of putting", "https://www.golfmagic.com/instruction/putting/the-fundamentals-of-putting/14632"],
+  mgsPutt: ["MyGolfSpy: Putting fundamentals pros never skip", "https://mygolfspy.com/news-opinion/the-putting-fundamentals-most-amateurs-overlook-but-pros-never-do/"],
+  btPutt: ["BizTimes: Practicing your putting (ladder drill)", "https://biztimes.com/putting"],
+  gdGrain: ["Golf Digest: How to read grain", "https://www.golfdigest.com/story/read-grain-putting-tips-explained-golf-digest"],
+  mgsRead: ["MyGolfSpy: 7 clues that help you see the break", "https://mygolfspy.com/news-opinion/instruction/how-to-read-golf-greens-more-accurately/"],
+  hmRead: ["HackMotion: How to read greens", "https://hackmotion.com/how-to-read-greens-in-golf/"],
+  btRead: ["Blue Tees: Reading green slope, fall line and grain", "https://blueteesgolf.com/blogs/news/how-to-read-green-slope-in-golf"],
+  gdTiger: ["Golf Digest: Tiger Woods teaches his stinger", "https://www.golfdigest.com/story/Tiger-Woods-is-going-to-teach-you-how-to-hit-his-majestic-stinger-shot"],
+  mizStinger: ["Mizuno Golf: How to hit the stinger", "https://usa.mizuno.com/blog/theinsider/2020/05/20/mizuno-golf-stinger/"],
+  glabStinger: ["Golfing Lab: Stinger vs. knockdown vs. punch", "https://golfinglab.com/?p=142"],
+  ncgFade: ["National Club Golfer: Dan Whittaker, how to hit a fade", "https://www.nationalclubgolfer.com/golf-tips/dan-whittaker-how-to-hit-a-fade-golf-tips"],
+  ggFade: ["Golfer Geeks: How to hit a fade with irons", "https://golfergeeks.com/how-to-hit-a-fade-with-irons/"],
+  hmFade: ["HackMotion: How to hit a fade", "https://hackmotion.com/how-to-hit-fade-in-golf/"],
+  golfRoryShape: ["GOLF.com: Rory McIlroy's guide to shaping shots", "https://golf.com/?p=15536247"],
+  golfFadeDraw: ["GOLF.com: How to hit a fade or draw", "https://golf.com/instruction/how-to-hit-fade-or-draw/?amp=1"],
+  mgsDraw: ["MyGolfSpy: How to hit a draw, step by step", "https://mygolfspy.com/news-opinion/how-to-hit-a-draw-step-by-step/"],
+  gdFoley: ["Golf Digest: Sean Foley, the law of the draw", "https://www.golfdigest.com/story/sean-foley-law-of-the-draw"],
+  ggDraw: ["Golfer Geeks: How to hit a draw with an iron", "https://golfergeeks.com/how-to-hit-a-draw-with-an-iron/"],
+  golfPunch: ["GOLF.com: How to hit a punch shot to escape trouble", "https://golf.com/instruction/approach-shots/how-hit-punch-shot-escape-trouble/"],
+  golfTree: ["GOLF.com: 5 steps for hitting under a tree", "https://golf.com/instruction/approach-shots/5-steps-hitting-golf-shot-under-tree/"],
+  pgPunch: ["Performance Golf: The golf punch shot", "https://www.performancegolf.com/blog/golf-punch-shot"],
+  igPunch: ["Inside Golf: 5 keys for playing from under the trees", "https://insidegolf.ca/read/14344-how-to-hit-a-punch-shot-5-keys-for-playing-from-under-the-trees"],
+  hmHighChip: ["HackMotion: How to hit a high chip shot", "https://hackmotion.com/how-to-hit-high-chip-shot/"],
+  golfRiceSoft: ["GOLF.com: Andrew Rice, land a chip softly", "https://golf.com/instruction/short-game/how-to-land-chip-softly-green-andrew-rice/?amp=1"],
+  golfFlop: ["GOLF.com: Top 100 Teacher, 2 ways to hit a flop", "https://golf.com/instruction/top-teacher-2-ways-hit-flop-shot/"],
+  golfSpin3: ["GOLF.com: How to spin chip shots, 3 tips", "https://golf.com/instruction/short-game/how-to-spin-chip-shots-three-tips"],
+  golftecSpin: ["GOLFTEC: Make your chips stop on a dime", "https://golftec.com/blog-posts/mastering-spin-how-to-make-your-chip-shots-stop-on-a-dime"],
+  gmSpin: ["Golf Monthly: Spin control tips", "https://golfmonthly.com/videos/short-game-tips/spin-control-tips"],
+  golfPedersen: ["GOLF.com: An LPGA pro's chip that stops on command", "https://golf.com/instruction/short-game/hit-chip-stops-on-command-emily-kristine-pedersen"],
+  wgHighLow: ["WomensGolf.com: High and low chips", "https://womensgolf.com/high-and-low-chips"],
+  mgsHighLow: ["MyGolfSpy: High vs. low chips, which yields better results?", "https://mygolfspy.com/news-opinion/high-versus-low-chips-and-pitches-which-approach-yields-better-results/"],
+  gdHarmonSand: ["Golf Digest: Butch Harmon, greenside bunker shots", "https://www.golfdigest.com/story/butch-harmon-greenside-bunker-shots"],
+  golfSplash: ["GOLF.com: The perfect splash out of the bunker", "https://golf.com/?p=15532042"],
+  gmSplash: ["Golf Monthly: Splash shot keys", "https://www.golfmonthly.com/tips/video-tips/splash-shot-keys-63570"],
+  agdSand: ["Australian Golf Digest: Open the face and skim the sand", "https://www.australiangolfdigest.com.au/?p=3673"],
+  titLong: ["Titleist: The 40-yard bunker shot", "https://titleist.com/instruction/the-40-yard-bunker-shot"],
+  pgaLong: ["PGA.com: The 40-yard bunker shot", "https://www.pga.com/archive/heres-how-make-one-of-toughest-shots-in-golf-40-yard-bunker"],
+  golfLong10: ["GOLF.com: 10 ways to become great at long bunker shots", "https://golf.com/instruction/bunker-shots/10-ways-become-great-long-bunker-shots/"],
+  golfFwy5: ["GOLF.com: Five keys from a fairway bunker", "https://golf.com/instruction/bunker-shots/how-to-hit-every-shot-five-keys-fairway-bunker/"],
+  golfFwyBest: ["GOLF.com: Best way out of a fairway bunker", "https://golf.com/instruction/best-way-get-out-fairway-bunker/"],
+  mgsFwy: ["MyGolfSpy: How to play from a fairway bunker", "https://mygolfspy.com/news-opinion/instruction/how-to-play-from-a-fairway-bunker-without-leaving-your-ball-in-the-sand/"],
+  gdistFwy: ["Golf Distillery: How to hit from a fairway bunker", "https://www.golfdistillery.com/shot-tips/bunker-shots/how-to-hit-fairway-bunker/"],
+  pgaWet: ["PGA.com: How to hit a bunker shot from wet sand", "https://pga.com/story/how-to-hit-a-bunker-shot-from-wet-sand"],
+  mgsWet: ["MyGolfSpy: Bunker shots from wet or compacted sand", "https://mygolfspy.com/news-opinion/instruction/how-to-play-bunker-shots-from-wet-or-compacted-sand/"],
+  hmWet: ["HackMotion: Wet sand bunker shots", "https://hackmotion.com/wet-sand-bunker-shots/"],
+  golfFirmSoft: ["GOLF.com: Bunker shots from firm sand vs. soft sand", "https://golf.com/instruction/bunker-shots/how-to-hit-bunker-shots-firm-sand-soft-sand/"],
+  golfBermuda: ["GOLF.com: How to read grain on Bermuda greens", "https://golf.com/instruction/how-to-read-grain-on-bermuda-grass-greens/"],
+  golfGrainTrick: ["GOLF.com: The putting trick pros use to read grain", "https://golf.com/instruction/putting/putting-trick-read-grain-bermuda-greens/"],
+  gdGrainClinic: ["Golf Digest: Reading grain on greens", "https://www.golfdigest.com/how-to/2-minute-clinic/reading-grain-on-greens"],
+  golfGrainWhat: ["GOLF.com: What is grain and how does it affect putting?", "https://golf.com/?p=15552112"],
+  golfGrips: ["GOLF.com: The most common putting grips on the PGA Tour", "https://golf.com/instruction/putting/which-putting-grip-is-best-for-you/"],
+  golfReverse: ["GOLF.com: What is a reverse overlap putting grip?", "https://golf.com/?p=14825565"],
+  pgGrips: ["Practical Golf: Putting grip styles", "https://practical-golf.com/putting-grip-styles"],
+  ggGrip: ["Golfer Geeks: How to grip a putter", "https://golfergeeks.com/how-to-grip-a-putter/"],
+  gmPlumb: ["Golf Monthly: How to plumb bob a putt", "https://golfmonthly.com/tips/how-to-plumb-bob-a-putt-245353"],
+  dumPlumb: ["Dummies: How to use plumb bobbing in golf", "https://www.dummies.com/article/how-to-use-plumb-bobbing-in-golf-206210"],
+  gdPlumbMyth: ["Golf Digest: Plumb bobbing only gets part of the picture", "https://www.golfdigest.com/story/golf-myths-debunked-plumb-bobbing-might-look-cool-only-getting-part-of-the-picture"],
+  glPlumb: ["GolfLink: How to plumb bob in golf", "https://golflink.com/instruction/plumb-bob-putter"],
+};
+
+const DATA = [
+ { club: "Driver", note: "Off the tee", qs: [
+  { q: "Why do I slice?",
+    why: "A slice curves hard to the right because the clubface is open compared to the direction the club is swinging. Most slicers pair that open face with an out-to-in path (the club cuts across the ball to the left), and many also catch it toward the heel. The usual root cause is the upper body unwinding too early from the top, which throws the club outside the line.",
+    fixes: [
+      ["Check your grip first.", "Turn both hands slightly to the right on the handle until you can see two or three knuckles on your left hand. A grip that's too weak leaves the face open at impact."],
+      ["Keep your back to the target a beat longer.", "Start the downswing with your lower body while your back still faces the target. That stops the shoulders from spinning open and throwing the club over the top."],
+      ["Square your shoulders at address.", "Lay a club across your chest. If it points left of the target, your swing will follow it. Aim shoulders parallel to the target line."],
+      ["Tee it higher and play it off the lead heel.", "About half the ball above the top of the driver, ball in line with your left heel. This lets you catch it on the way up instead of chopping down and across it."]
+    ],
+    drill: "Put a second ball on the ground just outside and in front of your teed ball. Hit the teed ball without touching the one on the ground. You can only miss it by swinging from the inside.",
+    src: ["golfArmitage","ncgSlice","gmPull","golfHarmon","gdsaSlice"] },
+  { q: "Why do I hook?",
+    why: "A hook starts right or straight and curves sharply left because the clubface is closed compared to your swing path at impact. With the driver it usually comes from a grip that's too strong, a path that swings too far from in to out, or hands that flip and outrace the body through the ball.",
+    fixes: [
+      ["Neutralize your grip.", "Turn your top hand a little to the left so the thumb sits closer to the center of the handle, and let the bottom hand follow. Two knuckles showing is plenty."],
+      ["Check ball position.", "Keep the ball in line with your left heel. If it creeps too far forward, the face has more time to close before it reaches the ball."],
+      ["Don't aim right to allow for the hook.", "Aiming right makes the path even more in to out and the hook worse. Set feet, hips and shoulders square to the target."],
+      ["Keep turning through the ball.", "When the body stops rotating, the hands take over and shut the face. Feel your chest keep turning toward the target all the way to a full finish."]
+    ],
+    drill: "Hit half-speed drives holding your finish with the clubface pointing up at the sky (not down at the ground) when your hands reach hip height after impact. That teaches a face that stays square instead of rolling shut.",
+    src: ["hmHookDr","golfStenzelHook","ncgHook","golfHook2"] },
+  { q: "Why do I top it?",
+    why: "Topping means the leading edge strikes the top half of the ball. With a driver that usually comes from standing up out of your posture (early extension), shifting your weight onto the back foot in the downswing, tension that shortens your arms, or a ball teed too low or played too far forward.",
+    fixes: [
+      ["Stay in your posture.", "Keep your chest over the ball and your hips back through impact. Rising up lifts the whole swing arc an inch or two, which is all it takes to top it."],
+      ["Lighten your grip pressure.", "Tight hands and arms pull the club up short of the ball. Hold it at about 4 on a 1–10 scale and keep that pressure the whole swing."],
+      ["Shift onto your lead side.", "Hanging on the back foot makes the club bottom out early and rise into the ball. Feel your weight move to your left foot as you start down."],
+      ["Check tee height and ball position.", "Half the ball above the crown of the driver, ball off the inside of the lead heel. Too low invites a steep chop; too far forward means you're reaching for it."]
+    ],
+    drill: "Make practice swings that brush the top of a tee pushed all the way into the ground just past your ball position. If you can clip the tee in front, you're staying down and moving forward.",
+    src: ["ncgTopDr","mgsTop","skillTop"] },
+  { q: "Why do I hit behind the ball?",
+    why: "With a driver, hitting behind the ball means the club bottoms out too early. You'll see shots that pop up, skied tee shots, or marks on top of the driver. It usually comes from swaying back off the ball, hanging on the back foot, or swinging down steep at a ball teed too high.",
+    fixes: [
+      ["Turn, don't sway.", "In the backswing, rotate around your trail hip instead of sliding your whole body to the right. A sway moves the bottom of your swing behind the ball."],
+      ["Get your weight moving forward first.", "Start the downswing with a small bump of the hips toward the target. The bottom of your swing follows your weight."],
+      ["Keep a slight tilt, not a lean back.", "Your back shoulder sits a little lower than the front at address. That's good. Falling back further at impact is what sends the club into the turf."],
+      ["Set a consistent tee height.", "Use the same height every time, roughly half the ball above the driver. A too-high tee with a steep swing pops it straight up."]
+    ],
+    drill: "Hit drives with your feet close together (about 6 inches apart) at 70 percent speed. You can't sway or hang back without losing balance, so the strike moves forward on its own.",
+    src: ["golftec","mgsFat","golfHutt"] },
+  { q: "How can I hit it farther?",
+    why: "Distance comes from three things: clubhead speed, how centered the strike is, and launch conditions (higher launch with less spin). For most amateurs the fastest yards come from hitting up on the ball and finding the center of the face, not from swinging harder.",
+    fixes: [
+      ["Tee it high.", "Put the middle of the ball level with the top edge of the driver. In launch-monitor testing, moving from a low to a high tee added over 30 yards for one golfer."],
+      ["Move the ball forward.", "Play it just inside your lead heel so you catch it slightly on the upswing. Hitting down with a driver adds spin and kills carry."],
+      ["Add some shoulder tilt.", "Drop your trail shoulder a bit lower at address. That moves the swing arc up through the ball."],
+      ["Find the center of the face.", "Spray foot powder or use impact tape on the face. A centered strike at normal speed beats a hard swing off the heel or toe."],
+      ["Check your equipment.", "On an adjustable driver, adding a degree of loft often adds carry for players with moderate swing speed."]
+    ],
+    drill: "Hit 10 balls with impact spray on the face and note where they strike. Adjust tee height, ball position and how far you stand from the ball until most hits are in the center, then build speed from there.",
+    src: ["golfTee","sigTee","stixDist","golfHutt","golfYarwood"] },
+  { q: "How can I hit it lower?",
+    why: "A lower drive is the shot for wind or firm fairways. You flight it down by taking loft off the club at impact and reducing spin. Tour players call it a stinger. The keys are a lower tee, a ball a little farther back, and a shorter, lower finish.",
+    fixes: [
+      ["Tee it lower.", "Lowering the tee takes away the instinct to hit up, so the ball launches lower."],
+      ["Ball slightly back.", "Move it an inch or two back from your normal spot off the lead heel."],
+      ["Swing through it, not up.", "Scheffler describes feeling like his arms stay lower through the ball instead of swinging up on it."],
+      ["Hold off the finish.", "Keep the club low and long after impact and stop at about shoulder height. A shorter finish keeps the flight down."]
+    ],
+    drill: "On the range, pick a tree or pole about 15 feet high and 100 yards out. Hit drivers trying to keep the ball under that height, using a lower tee and a three-quarter finish.",
+    src: ["ncgLow","golfScheffler","agdSting"] },
+  { q: "How can I hit it higher?",
+    why: "Low drives usually come from hitting down on the ball, a tee that's too low, or not enough loft. Getting it higher is mostly a setup job.",
+    fixes: [
+      ["Tee it higher.", "Half the ball above the crown. A low tee encourages a steep downswing, which launches it low with too much spin."],
+      ["Play the ball forward.", "Just inside the lead heel, so you meet it on the way up."],
+      ["Tilt your spine away from the target.", "Set your back shoulder lower than your front. It naturally adds launch."],
+      ["Add loft if you can.", "Use the adjustable hosel to add about a degree, or consider a higher-lofted driver head."],
+      ["Don't try to lift it.", "Scooping with the hands adds spin, not launch. Trust the loft."]
+    ],
+    drill: "Place a headcover about a foot in front of your teed ball on the target line. Make swings that send the ball over it. That encourages an upward strike.",
+    src: ["hmLaunch","igrTilt","golfTee"] }
+ ]},
+ { club: "Irons", note: "Fairway", qs: [
+  { q: "Why do I slice?",
+    why: "Same physics as the driver: an open clubface compared to the swing path. With irons it often shows up as a fade that turns into a big slice on long irons. The top causes are a weak grip, an out-to-in path from the shoulders spinning open early, and alignment that aims left.",
+    fixes: [
+      ["Strengthen the grip a touch.", "Turn your hands slightly to the right so the clubface can square up without help."],
+      ["Keep your back to the target longer.", "Let the hips start the downswing while the chest still faces away. This stops the over-the-top move."],
+      ["Check your alignment.", "Lay a club on the ground along your toes and another across your shoulders. Both should parallel the target line."],
+      ["Control the face.", "Feel the back of your lead hand face the ground just after impact rather than the sky."]
+    ],
+    drill: "Push an alignment stick into the ground a few feet in front of you, angled slightly right of target. Practice swinging out toward it. That trains an in-to-out path and cuts the left-to-right spin.",
+    src: ["golfArmitage","mmgSlice","gmJacobs"] },
+  { q: "Why do I hook?",
+    why: "A hook comes from a closed clubface at impact. With irons it's usually created by a grip that's too strong, a swing path that's too far in to out, poor alignment, or overactive hands that flip the face shut.",
+    fixes: [
+      ["Neutralize the grip.", "Put the thumb of your top hand closer to the center of the handle."],
+      ["Check the face halfway back.", "Stop when the shaft is parallel to the ground. The toe should point roughly up. If the face points down at the ground, it's closed."],
+      ["Square up your stance.", "Don't aim right and wait for the hook. Feet, hips and shoulders parallel to the target line."],
+      ["Keep the body turning.", "When your body stalls, the hands flip. Rotate your chest through to a full finish."]
+    ],
+    drill: "Hit three-quarter shots holding your finish with the clubface pointing up at waist height. This quiets the hands and keeps the face from rolling shut.",
+    src: ["hmHook","agHook","golfHook2","golfStenzelHook"] },
+  { q: "Why do I top it?",
+    why: "Topping irons is almost always a low-point problem. The club bottoms out behind the ball and is already rising when it gets there. Common causes are standing up out of posture, scooping to help the ball up, weight hanging back, tension, or a ball too far forward.",
+    fixes: [
+      ["Ball in the center.", "For mid irons, play the ball in the middle of your stance. Too far forward makes you catch it on the way up."],
+      ["Hit down. Let the loft do the lifting.", "Irons are built to launch the ball when you strike down on it. Trying to scoop it up is what tops it."],
+      ["Move your weight forward.", "Finish with most of your weight on your lead foot. That moves the bottom of your swing in front of the ball."],
+      ["Stay relaxed.", "Lighter grip pressure keeps your arms long. Tight arms pull up short of the ball."]
+    ],
+    drill: "Draw a line on the ground (spray paint or a tee line in the turf). Make swings where the divot starts on or just in front of the line. Then put a ball on the line and repeat.",
+    src: ["caddieTop","mgsTop","whyTop","golfTension"] },
+  { q: "Why do I hit behind the ball?",
+    why: "Fat iron shots are the flip side of topping: the low point is behind the ball. The club reaches the ground before it reaches the ball. The main causes are weight staying on the back foot, releasing the wrists too early (casting), and trying to scoop the ball into the air.",
+    fixes: [
+      ["Set up with weight forward.", "Start with about 60 percent of your weight on your front foot. Fix the setup before you touch the swing."],
+      ["Keep the lead wrist flat.", "Through impact the hands should lead the clubhead. Flipping the wrists early dumps the club into the ground."],
+      ["Shift forward as you start down.", "Feel your weight move onto your lead foot before the arms swing down."],
+      ["Aim your divot in front.", "Your divot should start about two inches in front of where the ball sat."]
+    ],
+    drill: "Fold a towel and place it about one grip-length behind the ball. Start with half swings and hit the ball without touching the towel. If you hit the towel, your low point is still too far back.",
+    src: ["mgsSetup","hmFat","golftec","mgsFat"] },
+  { q: "How can I hit it farther?",
+    why: "Pros don't hit irons farther because they swing harder. They compress the ball: hands ahead of the clubhead at impact, shaft leaning toward the target, strike ball first then turf. That delofts the club slightly and transfers more energy. A golf instructor quoted in GOLF.com says you can actually swing slower and hit it farther with better compression.",
+    fixes: [
+      ["Get forward shaft lean at impact.", "Hands ahead of the ball at impact, shaft pointing toward your lead hip. Many amateurs set it up right but lose it by flipping their wrists."],
+      ["Let your body create it.", "Don't shove your hands forward. Shift your weight and rotate your hips, and the shaft lean happens naturally."],
+      ["Strike ball first.", "Better contact adds more yards than more speed. Distance without solid contact is just a louder miss."],
+      ["Swing at 80 percent.", "Long irons with the same tempo as short irons. A smooth, well-sequenced swing generates more speed than forcing it."]
+    ],
+    drill: "Hit half-swing 7-irons focusing only on having your hands ahead of the ball at impact and holding a short, low finish. Once the strike feels compressed, slowly lengthen the swing.",
+    src: ["golfSprecher","mgsSame","hmCompress"] },
+  { q: "How can I hit it lower?",
+    why: "The knockdown or punch shot keeps the ball under the wind. You lower the flight by delofting the club and taking speed off the swing. Use one or two more club than normal.",
+    fixes: [
+      ["Club up.", "Take one or two more clubs than the distance calls for, since you'll swing easier."],
+      ["Ball slightly back.", "Move the ball back an inch or so in your stance."],
+      ["Hands ahead.", "Set your hands slightly ahead of the ball and keep them there through impact."],
+      ["Three-quarter swing.", "Take the club back about three-quarters of your normal length. Less speed means less spin and a lower flight."],
+      ["Short, low finish.", "Pros who hit it high finish high. For a low shot, finish with the hands around chest height."]
+    ],
+    drill: "On the range, hit half shots with a 7-iron and watch how low they fly. Then take a three-quarter swing with the ball back and a short finish. Aim to keep it under an imaginary line 20 feet up.",
+    src: ["gmKnock","golfKnock","titStinger"] },
+  { q: "How can I hit it higher?",
+    why: "The most common mistake when trying to hit irons higher is scooping with the hands, which actually reduces loft and causes thin shots. Height comes from ball position, a slightly shallower strike that preserves loft, and speed through rotation.",
+    fixes: [
+      ["Move the ball one ball forward.", "Tommy Fleetwood's tip: set up as if the ball you're hitting is one ball-width ahead of your stock position."],
+      ["Keep your head slightly behind the ball.", "A subtle spine tilt away from the target at impact helps add launch."],
+      ["Finish high.", "Swing all the way through to a high, full finish with your hands above your head."],
+      ["Check your irons.", "Modern game-improvement irons with a low center of gravity and weaker lofts launch the ball higher. Hybrids are easier to launch than long irons."]
+    ],
+    drill: "Hit three balls with your normal ball position and three moved one ball forward. Compare the height. Then add a high finish to the forward-position shots.",
+    src: ["golfFleetwood","giHigh","ggHigh"] },
+  { q: "How do you hit a stinger?",
+    why: "The stinger is a low, piercing tee shot that Tiger Woods made famous with his 2-iron. It flies on a flat line, stays under the wind and runs a long way after it lands. You give up some carry for control: it is a fairway-finder for windy days, firm ground and tight holes. Most amateurs hit it with a long iron, hybrid or utility iron off a low tee.",
+    fixes: [
+      ["Pick a long iron or hybrid.", "A 3- or 4-iron, a utility iron or a low-lofted hybrid. Anything with less loft than a 5-iron works."],
+      ["Tee it very low or play it off the turf.", "Barely off the ground. Scheffler uses a tee just to get a perfect lie, not to hit up on it."],
+      ["Ball slightly back of center.", "An inch or two behind your normal long-iron spot, with the hands ahead of the ball."],
+      ["Grip down a little.", "Choke down about an inch. You stand a touch closer and the shot gets more controllable."],
+      ["Swing smooth, not hard.", "Around 80 percent effort. Extra speed adds spin, and spin makes the ball climb."],
+      ["Hold the finish low.", "Keep the arms low and the clubface pointing at the target after impact, and stop the finish around shoulder height. Tiger's finish is short and abbreviated."]
+    ],
+    drill: "On the range, pick a target 150 yards out and try to keep the ball under an imaginary line about 20 feet high the whole way. Start with half swings and a low finish, then lengthen the swing only as long as the flight stays down.",
+    src: ["gdTiger","titStinger","golfScheffler","mizStinger","glabStinger"] },
+  { q: "How do you hit a cut?",
+    why: "A cut (or fade) starts a little left of the target and curves gently back to the right. You get it when the clubface is open to your swing path but still pointing near the target. Pros love it because a cut lands softer and is easier to control than a draw. The trick is a small, controlled curve, not a slice.",
+    fixes: [
+      ["Aim the face at the target.", "Set the clubface where you want the ball to finish."],
+      ["Open your body a little.", "Aim your feet, hips and shoulders slightly left of the target. Your swing will follow your body line, so the ball starts left."],
+      ["Ball a touch forward.", "About one ball forward of your normal spot. The club is already moving left when it reaches the ball."],
+      ["Hold off the release.", "Feel the back of your lead hand face the target longer through impact, so the face doesn't close."],
+      ["Finish a little left and high.", "Keep rotating your body through and let the hands finish more to the left."],
+      ["Take one more club.", "A cut flies a bit higher and shorter than your stock shot."]
+    ],
+    drill: "Lay one alignment stick on the ground pointed at the target and another a few degrees left of it for your feet. Hit 7-irons starting the ball down the left stick and curving it back to the target line.",
+    src: ["ncgFade","ggFade","hmFade","golfRoryShape","golfFadeDraw"] },
+  { q: "How do you hit a draw?",
+    why: "A draw starts a little right of the target and curves gently back to the left. It happens when the club swings from inside to out and the face is slightly closed to that path but open to the target. A draw usually flies lower and rolls farther than a fade, so many golfers find it adds distance.",
+    fixes: [
+      ["Aim the face at the target.", "Set the clubface pointing where you want the ball to finish."],
+      ["Close your stance slightly.", "Aim your feet, hips and shoulders a little right of the target. Your path will follow, so the ball starts right."],
+      ["Ball a touch back.", "About one ball behind your normal spot, so you catch it while the club is still moving to the right."],
+      ["Swing from the inside.", "Feel the club come down from behind you and swing out toward right field."],
+      ["Let the forearms rotate.", "Let your trail forearm roll over the lead one through impact. That closes the face enough to bring the ball back."],
+      ["Plan for extra roll.", "A draw lands with less spin. You may need one less club."]
+    ],
+    drill: "Put a headcover just outside and slightly behind the ball, toward you. Swing so you miss it. That stops you from coming over the top and forces the inside path a draw needs.",
+    src: ["mgsDraw","gdFoley","ggDraw","golfRoryShape","golfFadeDraw"] },
+  { q: "How do you hit a punch shot?",
+    why: "A punch shot is a short, low recovery shot, usually to get back to the fairway from under trees or branches. It's different from the knockdown: the goal isn't to hit a green, it's to keep the ball low and get it back in play. Short backswing, ball back, hands ahead, and almost no follow-through.",
+    fixes: [
+      ["Take the safe route.", "Pick the widest, lowest gap back to the fairway, even if it goes sideways. Playing for the green through a tiny gap is how one bad hole becomes a big number."],
+      ["Use a less-lofted club.", "A 5-, 6- or 7-iron, or a hybrid. Less loft keeps the ball under the branches."],
+      ["Ball back in your stance.", "Off the inside of your trail foot, with your hands well ahead of the ball."],
+      ["Weight on your front foot.", "About 60–70 percent on the lead side, and keep it there."],
+      ["Short backswing, short finish.", "Swing back to about hip or chest height and stop the follow-through early, with the hands low and the clubhead staying behind them."],
+      ["Expect a lot of run.", "A punched ball rolls a long way. Plan where it will stop, not just where it will land."]
+    ],
+    drill: "On the range, set an alignment stick or a pool noodle across two chairs about 4 feet high, 10 feet in front of you. Hit 6-irons under it with the ball back and a short swing. Then try different clubs to learn how low each one stays.",
+    src: ["golfPunch","golfTree","pgPunch","igPunch","gmKnock"] },
+  { q: "How do I hit a knockdown shot?",
+    why: "A knockdown is a controlled, lower approach shot into a green, the shot pros use into the wind or when they want exact distance. Unlike the punch shot, you're still trying to hit the green. Take more club, swing about three-quarters, and finish low. Rory McIlroy hit a three-quarter 9-iron from 130 yards into the wind on Sawgrass's island 17th to win a playoff.",
+    fixes: [
+      ["Take one or two more clubs.", "If it's a normal 8-iron, hit a 7 or 6. You'll swing easier, so the extra club makes up the distance."],
+      ["Grip down an inch.", "More control and a slightly shorter swing."],
+      ["Ball just back of center.", "Move it about one ball back from your normal spot, with the hands slightly ahead."],
+      ["Narrow your stance a little.", "A slightly narrower stance quiets the lower body for a more controlled swing."],
+      ["Three-quarter backswing.", "Stop with your lead arm about parallel to the ground. Less speed means less spin and a lower, steadier flight."],
+      ["Finish low.", "Pros who hit it high finish high. For a knockdown, stop the follow-through with your hands around chest height and the club pointing at the target."]
+    ],
+    drill: "Hit three normal 8-irons, then three knockdown 7-irons to the same target. Aim for the knockdowns to finish at the same distance but on a visibly lower flight. Practice it on windy range days.",
+    src: ["golfKnock","gmKnock","titStinger"] }
+ ]},
+ { club: "Chipping", note: "Around green", qs: [
+  { q: "What's the proper chip swing?",
+    why: "A chip is a short, low shot from just off the green that flies a little and rolls a lot. The setup does most of the work. Get your weight forward and keep it there, and the club strikes down on the ball and makes clean contact. Think of it like a putting stroke with a bit more arm swing.",
+    fixes: [
+      ["Narrow stance.", "Feet close together, about one clubhead width apart."],
+      ["Ball center to slightly back.", "Play it in the middle of your stance or just behind."],
+      ["Weight forward, and leave it there.", "Put about 60–70 percent of your weight on your lead foot and keep it there throughout the stroke. Mickelson says weight forward drives the club down; weight back makes the leading edge come up into the ball."],
+      ["Hands slightly ahead.", "A little forward shaft lean, hands roughly over your lead thigh. Don't overdo it, or you'll take away the club's bounce and dig."],
+      ["Quiet wrists, rock the shoulders.", "Keep a flat lead wrist through impact. Swing arms and shoulders together like a putting stroke, letting the club brush the grass."],
+      ["Grip down.", "Choke down on the handle for more control."]
+    ],
+    drill: "Three-stroke drill: set up properly, then swing the club back and through three times in a row without stopping, brushing the grass each time. It teaches a continuous, rhythmic motion instead of a jab.",
+    src: ["gdChip","gmChip","golfStenzelChip","golfMickelson","mgsChipWt"] },
+  { q: "What club should I chip with?",
+    why: "The rule most pros teach: get the ball on the green as soon as you can and let it roll like a putt. Rolling is easier to control than flying. So use the least lofted club that will carry the fringe and land on the green without running past the hole. Keep the same stroke and change the club to change how far it rolls.",
+    fixes: [
+      ["Just off the green, lots of green to work with:", "8- or 9-iron. The ball carries a short way and rolls out, roughly 1 part air to 2–3 parts roll."],
+      ["Middle distance to the pin:", "Pitching wedge. About half air, half roll."],
+      ["Short-sided, little green, or must carry rough:", "Sand wedge or lob wedge. More air, less roll."],
+      ["Rule of 11 shortcut:", "Subtract the iron number from 11 to get roughly how much it rolls for each unit it flies. A 9-iron is about 1 part air to 2 parts roll. Adjust for uphill (less roll) or downhill (more)."],
+      ["Fast or firm greens:", "Add loft, since the ball will roll farther."]
+    ],
+    drill: "Drop three balls in the same spot just off the green. Hit one with an 8-iron, one with a pitching wedge, one with a sand wedge, using the same stroke and landing spot. Watch how much each rolls. That's your club-selection chart.",
+    src: ["rsClub","golfBump","mgsUpDown","golficity"] },
+  { q: "How do I hit my chips higher?",
+    why: "A higher chip carries over rough, a bunker or a ridge and lands soft. The height comes from loft: a more lofted club, a slightly open face and a ball position that isn't too far back. The biggest mistake is trying to scoop the ball into the air with your wrists, which leads to thin and fat shots.",
+    fixes: [
+      ["Pick more loft.", "Use your sand wedge or lob wedge."],
+      ["Ball center or a touch forward.", "Moving the ball back takes loft off. For a higher chip, play it in the middle of your stance or slightly ahead."],
+      ["Open the face a little.", "Rotate the face slightly open before you take your grip. That adds loft and brings the bounce into play so the club slides instead of digging."],
+      ["Less shaft lean.", "Keep the shaft closer to straight up and down, with hands about even with the ball, not pressed far forward."],
+      ["Weight still slightly forward.", "Keep a little more weight on the lead foot so you still strike the ground in the right spot."],
+      ["Let the club pass the hands.", "Turn your chest through and let the clubhead swing out to a fuller, higher finish. Don't flip your wrists to lift it."]
+    ],
+    drill: "Lay a towel or headcover on the green about 6 feet in front of you. From just off the fringe, chip balls over it so they land soft and stop. Start with a sand wedge, then try the lob wedge.",
+    src: ["hmHighChip","golfRiceSoft","golfFlop"] },
+  { q: "How do I put spin on my chips?",
+    why: "Spin comes from clean contact: the grooves need to meet the ball with nothing between them, whether grass, sand or moisture. That's why pros spin it from tight fairway lies and can't from thick rough. A crisp, ball-first strike with a little speed and an accelerating stroke creates the spin. The lie and the ball matter almost as much as the technique.",
+    fixes: [
+      ["Check your lie first.", "You can spin it from a clean, tight lie. From thick rough, grass gets between the face and the ball and spin disappears. Plan for more roll."],
+      ["Strike ball first.", "Weight forward, hands slightly ahead, so the leading edge reaches the ball before the turf."],
+      ["Accelerate through.", "A slightly shorter backswing with a firm, accelerating follow-through spins it more than a long, slow swing that decelerates."],
+      ["Keep the face open through impact.", "Don't let the face roll closed. Feel the face pointing toward the sky after impact."],
+      ["Clean grooves, a softer ball.", "Wipe the face before every chip. A urethane-covered ball spins much more than a hard distance ball."],
+      ["Know the low spinner.", "Pros hit a low chip that hops twice and checks. That shot comes from a slightly back ball position, hands forward and a quick, crisp strike."]
+    ],
+    drill: "From a clean fringe lie, drop five balls. Hit each one with a crisp ball-first strike, then check the face for a clean ball mark centered in the grooves. Watch how the ball reacts on its second bounce and adjust your strike until it checks.",
+    src: ["golfSpin3","golftecSpin","gmSpin","golfPedersen"] },
+  { q: "When should I use a high shot or a low shot?",
+    why: "The rule most teachers agree on: go low whenever you can, go high only when you must. A low chip that rolls like a putt is easier to control and its bad shots are smaller. A high chip needs a perfect strike, and a mishit can skull across the green or chunk into the rough. MyGolfSpy's data on amateurs supports keeping the ball low and running.",
+    fixes: [
+      ["Go LOW when:", "The ball sits on a tight or firm lie. There's lots of green between you and the hole. Nothing is in your way. The wind is blowing. You're nervous and want the safest shot."],
+      ["Go HIGH when:", "You have to carry a bunker, rough or a ridge. The pin is close to your side of the green (short-sided). The green runs away from you downhill. The ball sits up nicely in fluffy grass."],
+      ["Ask the putter question first.", "If you could putt it, putt it. If not, ask whether you could chip-and-run it. Only go high when the first two won't work."],
+      ["Watch the lie.", "A high shot from a bare or tight lie is the hardest shot around the green. If the lie is thin, take a lower option even if it means a longer putt."],
+      ["Plan the landing spot.", "Pick exactly where the ball will land for each shot. Low chips land just on the green; high chips land closer to the hole."]
+    ],
+    drill: "Practice the same chip three ways: putter, 8-iron bump and run, and a high lob wedge. Hit five of each and see which finishes closest on average. Most golfers find the lower option wins more often.",
+    src: ["mgsHighLow","wgHighLow","hmHighChip","golficity"] }
+ ]},
+ { club: "Putting", note: "On the green", qs: [
+  { q: "What is the correct putting stroke?",
+    why: "The putting stroke is a pendulum, like a grandfather clock. Your shoulders rock back and through while your arms, hands and wrists stay quiet and your lower body doesn't move. The backswing and follow-through are the same length at the same rhythm, and you control distance with the length of the stroke, not by hitting harder.",
+    fixes: [
+      ["Eyes over the ball.", "Your eyes should be directly over the ball or just inside it. Check by holding a ball at the bridge of your nose and dropping it. It should land on your ball."],
+      ["Everything square.", "Feet, hips, shoulders and forearms parallel to your target line, putter face aimed at your start line."],
+      ["Arms hang, triangle stays.", "Let the arms hang under your shoulders. The arms and shoulders form a triangle that stays intact through the stroke."],
+      ["Rock the shoulders.", "Move the putter with the shoulders, not the hands. Keep the putter head low."],
+      ["Accelerate, don't decelerate.", "A huge backswing that slows into the ball is a common mistake. Equal length back and through, same tempo."],
+      ["Ball slightly forward.", "Just ahead of the center of your stance so you catch it with a level or slightly upward stroke."]
+    ],
+    drill: "Ladder drill: put balls at 6, 9, 12 and 15 feet in a straight line. Keep the same tempo on every putt and only change the stroke length. You'll learn distance control fast.",
+    src: ["hkPutt","gmagPutt","mgsPutt","btPutt"] },
+  { q: "How do you read greens?",
+    why: "Reading greens comes down to slope, speed and grain. Slope tells you which way the ball breaks. Speed tells you how much: a slower putt breaks more because it's on the slope longer. Grain, the direction the grass grows, matters a lot on Bermuda greens common in the Southeast.",
+    fixes: [
+      ["Read on the way up.", "As you walk onto the green, look at the overall tilt. Most greens slope back to front."],
+      ["Find the low side.", "Read from behind the ball and from the low side of the hole. That shows the break best."],
+      ["Feel it with your feet.", "Straddle your line. Your feet often feel slope your eyes miss."],
+      ["Read the last three feet twice.", "The ball breaks most as it slows near the hole."],
+      ["Read the grain on Bermuda.", "Grass looking shiny means you're putting with the grain: faster, less break. Dark and dull means against the grain: slower. The cup gives a clue too, with a ragged, dead side and a smooth side. Grain runs toward the dead side."],
+      ["Commit to a speed first.", "Decide how hard you'll hit it before choosing the line. The same putt breaks more if it's slower."]
+    ],
+    drill: "Putt from 15 feet on a slope while looking at the hole instead of the ball. You'll quickly get a feel for how speed changes the break.",
+    src: ["gdGrain","mgsRead","hmRead","btRead"] },
+  { q: "How can you tell which way the grain is running?",
+    why: "Grain is the direction the grass blades lean as they grow. It matters most on Bermuda greens, which are what you'll find on most courses in the Southeast. Putting down-grain makes the ball roll faster and break less. Putting into the grain slows it and can make it break more. A grainy putt across the slope can even pull the ball the opposite way from what the slope says.",
+    fixes: [
+      ["Look at the cup.", "This is the best clue. One edge of the hole looks sharp and clean; the opposite edge looks ragged, brown or crumbly. The grain grows toward the ragged, dead side."],
+      ["Shiny means down-grain.", "Look along your line. If the grass looks shiny and light, the grain is running away from you, so the putt will be fast. If it looks dull and dark, you're putting into the grain, so it will be slow."],
+      ["Use the sun.", "Bermuda tends to grow toward the setting sun, so grain often runs west, especially late in the day."],
+      ["Follow the water.", "Grain usually leans toward the nearest water and toward where the green drains, which is usually downhill."],
+      ["Check the fringe.", "Rub the fringe lightly with your hand or the sole of your putter (not the putting surface). Grass that brushes smooth is lying with the grain. Grass that stands up and resists is against it."],
+      ["Watch the ball die.", "Grain shows up most at the end of a putt as the ball slows. On short, flat putts on Bermuda, give the grain more weight than the slope."]
+    ],
+    drill: "On the practice green, walk around each hole and find the ragged edge. Then putt the same 10-footer from four sides of the hole: down-grain, into the grain, and across from each side. You'll feel how much the speed changes.",
+    src: ["golfBermuda","golfGrainTrick","gdGrainClinic","gdGrain","golfGrainWhat"] },
+  { q: "What are the most popular putting grips?",
+    why: "There's no one correct putting grip. The best one is whichever keeps your wrists quiet and your putter face square to your line. The reverse overlap is the most common on the PGA Tour, but plenty of great putters use something else. If you struggle with the yips or a wristy stroke, trying a different grip is one of the easiest changes you can make.",
+    fixes: [
+      ["Reverse overlap (most common).", "Like your normal grip, but the index finger of your lead hand lies over the fingers of the trail hand. It locks the hands together and quiets the wrists. Tiger Woods has used it his whole career."],
+      ["Cross-handed (left hand low).", "Lead hand below the trail hand on the grip. It levels your shoulders and stops the lead wrist from breaking down. Jordan Spieth is a well-known example. Great for players who pull or flip short putts."],
+      ["The claw.", "Lead hand normal on top; the trail hand turns sideways and holds the grip lightly between the thumb and fingers like holding a pencil. It takes the trail hand out of the stroke. Popular with players fighting the yips."],
+      ["Arm-lock.", "Uses a longer putter with the grip pressed against the inside of the lead forearm, so arm and putter move as one. Very stable, but you need an arm-lock putter with extra loft."],
+      ["Ten-finger or split grip.", "All ten fingers on the grip, or the hands slightly apart. Simple and comfortable for some players, especially those with arthritis in the hands."],
+      ["Whatever you choose:", "Hold it lightly (about 3–4 out of 10 pressure), keep the palms facing each other, and keep the putter shaft in line with your forearms."]
+    ],
+    drill: "Hit ten 6-foot putts with each grip, keeping score for each. Then do the same from 20 feet to test distance control. Stick with the grip that wins both tests for a few rounds before deciding.",
+    src: ["golfGrips","golfReverse","pgGrips","ggGrip"] },
+  { q: "What's the correct way to plumb bob?",
+    why: "Plumb bobbing uses your putter as a vertical reference line to show which way a putt breaks. Hanging freely, the shaft is perfectly vertical, so if the ground tilts, the hole will appear off to one side. Done right, it confirms your read. It only works properly when your body is level and aligned with the line, and it shows slope only where you're standing.",
+    fixes: [
+      ["Find your dominant eye.", "Make a small circle with your thumb and index finger and look through it at something far away. Close one eye. If the object stays in the circle, that's your dominant eye. Only use that eye when plumb bobbing."],
+      ["Stand behind the ball, on your line.", "Stand a few feet behind the ball on an extension of the line from the hole through the ball. Stand straight up or crouch, with your body square to the line."],
+      ["Let the putter hang freely.", "Hold the putter at the top of the grip with your thumb and index finger, at arm's length in front of your dominant eye. Let it dangle so it hangs straight down. Turn the toe toward or away from the hole; just do it the same way every time."],
+      ["Line the lower shaft up with the ball.", "Close your weak eye and move the putter so the lower part of the shaft covers the ball."],
+      ["Look up the shaft to the hole.", "If the hole is to the right of the shaft, the putt breaks left to right. If it's to the left, the putt breaks right to left. The farther off the shaft, the more break."],
+      ["Use it as a check, not a full read.", "It only tells you the slope where you're standing. Combine it with reading from the low side, feeling the slope with your feet and checking the grain."]
+    ],
+    drill: "On the practice green, find a putt with obvious break. Plumb bob it, predict the break, and then putt it. Then try a straight putt to see what 'no break' looks like through the shaft. A few rounds of this will tell you whether the method works for your eyes.",
+    src: ["gmPlumb","dumPlumb","glPlumb","gdPlumbMyth"] }
+ ]},
+ { club: "Sand Wedge", note: "Bunkers", qs: [
+  { q: "How do you hit a sand shot?",
+    why: "The greenside bunker shot is the one shot in golf where you don't hit the ball. You hit the sand an inch or two behind it, and the sand pushes the ball out. The sand wedge's bounce (the rounded bottom of the club) is built to slide through the sand instead of digging, so you have to open the face and let it do its job.",
+    fixes: [
+      ["Open the face first, then grip.", "Turn the clubface open so it points a little right of target, then take your grip. Gripping first and then turning your hands doesn't stay open."],
+      ["Wider stance, dig your feet in.", "Wiggle your feet into the sand for a stable base. It also lowers you so the club enters the sand."],
+      ["Ball forward of center.", "Play it off your lead heel or just inside it."],
+      ["Aim your body a little left.", "With an open face, set your feet and shoulders slightly left of the target and swing along your body line."],
+      ["Hit 1–2 inches behind the ball.", "Look at a spot in the sand behind the ball, not at the ball itself."],
+      ["Swing through to a full finish.", "Most bunker shots fail from stopping at the sand. Accelerate and splash the sand onto the green. Make a bigger swing than you think you need."]
+    ],
+    drill: "Draw a line in the sand with no ball. Make swings that enter the sand on the line and splash out a shallow divot in front of it. Then draw the line and place a ball about two inches in front of it, and hit the line again.",
+    src: ["gdHarmonSand","golfSplash","gmSplash","agdSand"] },
+  { q: "How do you hit a long bunker shot?",
+    why: "The 30- to 40-yard greenside bunker shot is often called the hardest shot in golf. A normal splash with a sand wedge won't carry far enough, and trying to pick it clean risks skulling it over the green. The answer is to take less loft and take less sand.",
+    fixes: [
+      ["Take less loft.", "Use a gap wedge, pitching wedge or even a 9-iron instead of the sand wedge. The lower loft carries it farther with the same swing."],
+      ["Keep the face square or slightly open.", "Don't open it wide like a short bunker shot."],
+      ["Ball center of the stance.", "A little farther back than a normal sand shot."],
+      ["Take less sand.", "Hit about an inch behind the ball instead of two, for a shallower splash."],
+      ["Make a full, committed swing.", "Turn your body through to a full finish. This is not a soft shot."],
+      ["Accept a little roll.", "Less loft and less sand means the ball comes out with more roll. Aim to land it short of the pin."]
+    ],
+    drill: "From the same spot in a practice bunker, hit three balls each with a sand wedge, gap wedge and pitching wedge, same swing every time. Note how far each one carries. That gives you a club for each long bunker distance.",
+    src: ["titLong","pgaLong","golfLong10"] },
+  { q: "How do you hit from a fairway bunker?",
+    why: "A fairway bunker shot is the opposite of a greenside bunker shot: you want to hit the ball first and take very little sand. Hitting even slightly behind the ball kills the shot. The first goal is to get out, so check the height of the lip before picking your club.",
+    fixes: [
+      ["Check the lip first.", "Pick a club with enough loft to clear the front lip. If in doubt, take more loft. Getting out is always the first priority."],
+      ["Take one more club.", "You'll swing a bit easier and grip down, so add a club for the distance."],
+      ["Grip down an inch.", "This makes up for your feet being dug into the sand and helps you catch the ball first."],
+      ["Feet in lightly, ball slightly back.", "Wiggle your feet in just enough for a firm footing. Play the ball a little back of your normal spot."],
+      ["Quiet lower body.", "Make a mostly arms-and-shoulders swing with less leg drive. Keeping your height steady prevents hitting behind it."],
+      ["Look at the front of the ball.", "Focusing on the front edge of the ball helps you catch it clean, ball first."]
+    ],
+    drill: "In a practice bunker, draw a line in the sand and place a ball just in front of it. Hit shots where the club touches the sand only after the line and after the ball. Any sand before the line means you hit it fat.",
+    src: ["golfFwy5","golfFwyBest","mgsFwy","gdistFwy"] },
+  { q: "How do you hit out of wet sand?",
+    why: "Wet or packed sand is firm, so the club bounces off it instead of sliding under the ball. That's why the normal open-face splash can skull the ball across the green. In wet sand you take less bounce, keep the face squarer, and dig a little more, because the firm sand pushes the ball out with more force.",
+    fixes: [
+      ["Square the face more.", "Open the face less than usual, or keep it square. An open face adds bounce, and bounce skips off firm sand."],
+      ["Less bounce, if you have the choice.", "A lob wedge or gap wedge with less bounce digs into firm sand better than a high-bounce sand wedge."],
+      ["Hit closer to the ball.", "About an inch behind it instead of two. The firm sand moves the ball more."],
+      ["Steeper swing.", "Set up with the ball in the middle of your stance and a little more weight on your lead foot so the club comes down steeper and digs."],
+      ["Shorter swing.", "Wet sand comes out with more speed. A slightly shorter swing than a normal bunker shot keeps it from flying the green."],
+      ["Puddles and standing water.", "Under the Rules of Golf you get free relief from temporary water in a bunker, still in the bunker, no closer to the hole."]
+    ],
+    drill: "When the practice bunker is wet after rain, hit five balls with your normal open-face technique, then five with a square face, ball centered and a slightly shorter swing. Compare how cleanly each set comes out.",
+    src: ["pgaWet","mgsWet","hmWet","golfFirmSoft"] }
+ ]}
+];
+
+// Irons order: distance and height first, then fixes, then shot-making
+(function () {
+  const order = ["How can I hit it farther?", "How can I hit it higher?", "How can I hit it lower?",
+    "Why do I slice?", "Why do I hook?", "Why do I top it?", "Why do I hit behind the ball?",
+    "How do you hit a draw?", "How do you hit a cut?", "How do I hit a knockdown shot?",
+    "How do you hit a punch shot?", "How do you hit a stinger?"];
+  const irons = DATA.find(d => d.club === "Irons");
+  irons.qs.sort((a, b) => order.indexOf(a.q) - order.indexOf(b.q));
+})();
+
+const tabsEl = document.getElementById("tabs");
+const qEl = document.getElementById("questions");
+const ansEl = document.getElementById("answer");
+const clearBtn = document.getElementById("clear");
+let curClub = 0, curQ = null;
+
+const esc = s => s.replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]));
+
+function renderTabs() {
+  tabsEl.innerHTML = "";
+  DATA.forEach((d, i) => {
+    const b = document.createElement("button");
+    b.className = "tab"; b.type = "button"; b.id = "tab-" + i;
+    b.setAttribute("role", "tab");
+    b.setAttribute("aria-selected", i === curClub ? "true" : "false");
+    b.innerHTML = `<span>${d.club}</span><small>${d.qs.length} Q</small>`;
+    b.onclick = () => { curClub = i; renderTabs(); renderQs(); };
+    tabsEl.appendChild(b);
+  });
+}
+
+function renderQs() {
+  qEl.innerHTML = "";
+  DATA[curClub].qs.forEach((item, i) => {
+    const li = document.createElement("li");
+    const b = document.createElement("button");
+    b.className = "q"; b.type = "button"; b.id = `q-${curClub}-${i}`;
+    const on = curQ && curQ[0] === curClub && curQ[1] === i;
+    b.setAttribute("aria-pressed", on ? "true" : "false");
+    b.innerHTML = `<span class="hole">${i + 1}</span><span>${esc(item.q)}</span><span class="go" aria-hidden="true">›</span>`;
+    b.onclick = () => { curQ = [curClub, i]; renderQs(); renderAnswer(true); };
+    li.appendChild(b); qEl.appendChild(li);
+  });
+}
+
+function renderAnswer(scroll) {
+  if (!curQ) {
+    clearBtn.disabled = true;
+    ansEl.innerHTML = `<div class="empty">
+      <svg viewBox="0 0 54 54" aria-hidden="true"><circle cx="27" cy="27" r="22" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="4 5"/><circle cx="27" cy="27" r="8" fill="currentColor" opacity=".25"/></svg>
+      <p><strong>The pro is ready.</strong></p>
+      <p>Choose a club above, then tap a question. The answer and the pro's corrections will appear here.</p>
+    </div>`;
+    return;
+  }
+  const d = DATA[curQ[0]], a = d.qs[curQ[1]];
+  clearBtn.disabled = false;
+  ansEl.innerHTML = `<div class="ans-body">
+    <div><p class="eyebrow">${esc(d.club)} · Question ${curQ[1] + 1}</p><h2>${esc(a.q)}</h2></div>
+    <div><h3>What's happening</h3><p>${esc(a.why)}</p></div>
+    <div><h3>Pro corrections</h3><ul class="fixes">${a.fixes.map(f => `<li><span><b>${esc(f[0])}</b> ${esc(f[1])}</span></li>`).join("")}</ul></div>
+    <div class="drill"><h3>Practice drill</h3><p>${esc(a.drill)}</p></div>
+    <div class="sources"><h3>Pro sources</h3><ul>${a.src.map(k => `<li><a href="${S[k][1]}" target="_blank" rel="noopener">${esc(S[k][0])}</a></li>`).join("")}</ul></div>
+    <p class="note">If a fault keeps coming back, a lesson with a PGA professional who can watch your swing is the fastest fix.</p>
+  </div>`;
+  if (scroll) ansEl.closest(".card").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+}
+
+clearBtn.onclick = () => {
+  curQ = null; renderQs(); renderAnswer(false);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
+
+renderTabs(); renderQs(); renderAnswer(false);
+</script>
+
+</body></html>
